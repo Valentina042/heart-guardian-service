@@ -2,7 +2,6 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import threading
 import random
 import smtplib
 from email.mime.text import MIMEText
