@@ -1,5 +1,5 @@
 from flask import Flask, jsonify
-from service import questions_security
+from api.service import questions_security
 from flask_cors import CORS
 
 app = Flask(__name__)
