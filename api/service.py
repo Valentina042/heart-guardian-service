@@ -6,15 +6,27 @@ import random
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from data import create_user, find_user_by_email
+
+
+def save_user(user):
+    userFound = find_user_by_email(user.email)
+    if userFound != None:
+        raise Exception(
+            "Ya hay un usuario con este correo registrado {}".format(user.email))
+    create_user(user)
+    return user
 
 
 def questions_security():
-    questions = ["¿Se está realizando alguna actividad física?", "¿Se está en reposo?","¿Presenta Mareo, Fatiga, Sudoración? "]
+    questions = ["¿Se está realizando alguna actividad física?",
+                 "¿Se está en reposo?", "¿Presenta Mareo, Fatiga, Sudoración? "]
     return questions
+
 
 def emergency():
     def send_email(help_contact):
-    # Create a multipart message
+        # Create a multipart message
         msg = MIMEMultipart()
         msg["From"] = help_contact[0]
         msg["To"] = help_contact[2]
@@ -50,14 +62,15 @@ def emergency():
     message = "This is a test email sent using Python."
     send_email(help_contact)
 
+
 def alert(statistics_data, HR):
-    #normal
+    # normal
     min_mean = statistics_data[0]-statistics_data[0]*0.10
     max_mean = min_mean = statistics_data[0]*0.10+statistics_data[0]
-    if min_mean <= HR and HR<= max_mean:
+    if min_mean <= HR and HR <= max_mean:
         answer = "Tu ritmo cardiaco está dentro de los valores normales :)"
         return answer
-    elif HR <= statistics_data[1] and HR> statistics_data[4]:
+    elif HR <= statistics_data[1] and HR > statistics_data[4]:
         answer = "Tu ritmo cardiaco está un poco por debajo de los valores normales :/"
         questions_security()
         return answer
@@ -69,7 +82,7 @@ def alert(statistics_data, HR):
         answer = "Tu ritmo cardiaco está muy por debajo de los valores normales :("
         emergency()
         return answer
-    elif HR>= statistics_data[3]:
+    elif HR >= statistics_data[3]:
         answer = "Tu ritmo cardiaco está muy por encima de los valores normales :("
         emergency()
         return answer
@@ -78,9 +91,11 @@ def alert(statistics_data, HR):
 def mongo_db(statistics_data):
     pass
 
+
 def random_HeartRate(statistics_data):
     HR = random.randint(statistics_data[1], statistics_data[2])
     return HR
+
 
 def read_data(documents):
     for document in documents:
@@ -90,15 +105,20 @@ def read_data(documents):
         max_df = data['BPM'].max()
         max_maxtolerance = (max_df*0.15)+max_df
         min_mintolerance = min_df-(min_df*0.15)
-    statistics_data = [mean_df,min_df,max_df,max_maxtolerance, min_mintolerance]
+    statistics_data = [mean_df, min_df, max_df,
+                       max_maxtolerance, min_mintolerance]
     mongo_db()
     return statistics_data
 
+
 def get_data():
-    file1= pd.read_excel("Datos Laura.xlsx", header=0, index_col=None)
-    file2= pd.read_excel("Datos Gus.xlsx",sheet_name='5-Dic-2022', header=0, index_col=None)
-    file3= pd.read_excel("Datos Gus.xlsx",sheet_name='4-Mayo', header=0, index_col=None)
-    file4= pd.read_excel("Datos Gus.xlsx",sheet_name='7-Mayo', header=0, index_col=None)
+    file1 = pd.read_excel("Datos Laura.xlsx", header=0, index_col=None)
+    file2 = pd.read_excel(
+        "Datos Gus.xlsx", sheet_name='5-Dic-2022', header=0, index_col=None)
+    file3 = pd.read_excel(
+        "Datos Gus.xlsx", sheet_name='4-Mayo', header=0, index_col=None)
+    file4 = pd.read_excel(
+        "Datos Gus.xlsx", sheet_name='7-Mayo', header=0, index_col=None)
     documents = [file1, file2, file3, file4]
     read_data()
     return documents
